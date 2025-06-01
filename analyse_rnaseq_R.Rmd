@@ -26,8 +26,9 @@ library(DESeq2)
 dds<-DESeqDataSetFromMatrix(countData= matrice_counts, colData=coldata,  design= ~condition  )
 ```
 
-##resultats
+
 ```{r}
+#deseq
 dds <- DESeq(dds)
 res<-results(dds)
 summary(res)
