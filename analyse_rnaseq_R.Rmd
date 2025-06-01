@@ -1,0 +1,75 @@
+---
+title: "analyse_rnaseq"
+output: html_document
+date: "2025-05-29"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r cars}
+#lecture du fichier
+RNAseq_data<-read.csv("comptage_rnaseq.csv", sep=",", header=TRUE)
+RNAseq_data
+#data frame avec deux colonnes conditions et samples 
+coldata<-data.frame(condition=rep(c("A", "B"), each=3), sample=c("A_1", "A_2", "A_3", "B_1","B_2","B_3" ))
+rownames(coldata)<-coldata$sample
+
+
+```
+```{r}
+#créer une matrice ne contenant que du numérique pour deseq2
+counts<-RNAseq_data[,c("A_1", "A_2", "A_3", "B_1","B_2","B_3" )]
+matrice_counts<-as.matrix(counts)
+rownames(matrice_counts)<-RNAseq_data$gene_id
+library(DESeq2)
+dds<-DESeqDataSetFromMatrix(countData= matrice_counts, colData=coldata,  design= ~condition  )
+
+```
+```{r}
+
+
+#resultats
+dds <- DESeq(dds)
+res<-results(dds)
+summary(res)
+resSign<-res[!is.na(res$padj)& res$padj<0.05,]#sélectionne uniquement les lignes non nulles et où padj < 0.05
+#sauvegarde gènes significatifs
+write.csv(as.data.frame(resSign), file = "genes_significatifs.csv")
+
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+
+res_df<-as.data.frame(res)#créer les résultats en data frame
+res_df$significant<-res_df$padj<0.05 #rajouter une colonne de significativité en fonction de padj
+library(ggplot2)
+plotvolcano<-ggplot(data = res_df, aes(x=log2FoldChange, y= -log10(pvalue), color = significant))+geom_point()+
+  labs(title = "Volcano Plot",
+       x = "log2 Fold Change",
+       y = "-log10(p-value)")
+plotvolcano
+
+#sauvegarde graphique
+ggsave("volcano_plot.png", plot=plotvolcano,width = 8, height = 5)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+
+
+```{r}
+
+```
+
+
+
+
+
+
