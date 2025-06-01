@@ -16,22 +16,18 @@ RNAseq_data
 #data frame avec deux colonnes conditions et samples 
 coldata<-data.frame(condition=rep(c("A", "B"), each=3), sample=c("A_1", "A_2", "A_3", "B_1","B_2","B_3" ))
 rownames(coldata)<-coldata$sample
-
-
 ```
+
 ```{r}
-#créer une matrice ne contenant que du numérique pour deseq2
-counts<-RNAseq_data[,c("A_1", "A_2", "A_3", "B_1","B_2","B_3" )]
+counts<-RNAseq_data[,c("A_1", "A_2", "A_3", "B_1","B_2","B_3" )] #créer une matrice ne contenant que du numérique pour deseq2
 matrice_counts<-as.matrix(counts)
 rownames(matrice_counts)<-RNAseq_data$gene_id
 library(DESeq2)
 dds<-DESeqDataSetFromMatrix(countData= matrice_counts, colData=coldata,  design= ~condition  )
-
 ```
-```{r}
-
 
 #resultats
+```{r}
 dds <- DESeq(dds)
 res<-results(dds)
 summary(res)
@@ -54,7 +50,6 @@ plotvolcano<-ggplot(data = res_df, aes(x=log2FoldChange, y= -log10(pvalue), colo
   labs(title = "Volcano Plot",
        x = "log2 Fold Change",
        y = "-log10(p-value)")
-plotvolcano
 
 #sauvegarde graphique
 ggsave("volcano_plot.png", plot=plotvolcano,width = 8, height = 5)
