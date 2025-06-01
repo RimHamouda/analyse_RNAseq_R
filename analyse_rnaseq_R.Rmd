@@ -40,9 +40,7 @@ write.csv(as.data.frame(resSign), file = "genes_significatifs.csv")
 
 ## Including Plots
 
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
+```{r}
 
 res_df<-as.data.frame(res)#créer les résultats en data frame
 res_df$significant<-res_df$padj<0.05 #rajouter une colonne de significativité en fonction de padj
